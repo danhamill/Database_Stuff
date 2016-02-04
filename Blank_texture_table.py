@@ -6,24 +6,26 @@
 import psycopg2
 
 try:
-    conn = psycopg2.connect("dbname='Reach 4a' user='root' host='localhost' port='9000' password='myPassword'")
+    conn = psycopg2.connect("dbname='reach_4a' user='root' host='localhost' port='9000' password='myPassword'")
+    tblname = 'Sept_2014'
+    cur = conn.cursor()
+    sql = "CREATE TABLE %s (gid serial NOT NULL, easting double precision, northing double precision, texture double precision, the_geom geometry, scan_line text, CONSTRAINT r4a_pkey1 PRIMARY KEY (gid), CONSTRAINT enforce_dims_the_geom CHECK (st_ndims(the_geom) = 2), CONSTRAINT enforce_geotype_geom CHECK (geometrytype(the_geom) = 'POINT'::text OR the_geom IS NULL), CONSTRAINT enforce_srid_the_geom CHECK (st_srid(the_geom) = 26949)) WITH (  OIDS=FALSE);" % tblname
+    sql2 = "ALTER TABLE %s OWNER TO postgres;" % tblname
+    cur.execute(sql)
+    cur.execute(sql2)
+    #make changes to the database persistent
+    conn.commit()
 except:
     print "I am unable to connect to the database"
 
 
 #get table names from data base
-cur = conn.cursor()
-cur.execute("CREATE TABLE test (gid serial NOT NULL, easting double precision, northing double precision, texture double precision, the_geom geometry, scan_line text, CONSTRAINT r4a_pkey1 PRIMARY KEY (gid), CONSTRAINT enforce_dims_the_geom CHECK (st_ndims(the_geom) = 2), CONSTRAINT enforce_geotype_geom CHECK (geometrytype(the_geom) = 'POINT'::text OR the_geom IS NULL), CONSTRAINT enforce_srid_the_geom CHECK (st_srid(the_geom) = 26949)) WITH (  OIDS=FALSE);")
 
-cur.execute("ALTER TABLE test OWNER TO postgres;")
-
-#make changes to the database persistant
-conn.commit()
 
 #Close Database
 try:
     conn.close()
+    print 'Database connection destroyed'
 except:
     print "I cant close the database"
 
-print 'Database connection destroyed'
