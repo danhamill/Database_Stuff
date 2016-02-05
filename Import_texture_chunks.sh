@@ -27,6 +27,6 @@ echo "That directory doesn't exists"
 fi
 done
 
-#Populate Geometry field 
+#Populate Geometry field For a survey date
 psql -h localhost -d reach_4a -U root -p 9000 -c "UPDATE "$tablename" SET the_geom = ST_SetSRID(ST_MakePoint(CAST(easting AS double precision), CAST(northing AS double precision)), 26949);"
 

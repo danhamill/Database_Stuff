@@ -29,3 +29,4 @@ try:
 except:
     print "I cant close the database"
 
+COPY 
