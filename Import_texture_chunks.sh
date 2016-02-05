@@ -28,5 +28,5 @@ fi
 done
 
 #Populate Geometry field 
-psql -h localhost -d reach_4a -U root -p 9000 -c "UPDATE "$ss" SET the_geom = ST_SetSRID(ST_MakePoint(CAST(easting AS double precision), CAST(northing AS double precision)), 26949);"
+psql -h localhost -d reach_4a -U root -p 9000 -c "UPDATE "$tablename" SET the_geom = ST_SetSRID(ST_MakePoint(CAST(easting AS double precision), CAST(northing AS double precision)), 26949);"
 
