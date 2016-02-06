@@ -1,8 +1,6 @@
-
-
 #list of side scan and texture chunks
-ssfiles=$(find /Users/danielhamill/Documents/Sept2014 -name 'x_y_ss*.asc')
-texfiles=$(find /Users/danielhamill/Documents/Sept2014 -name 'x_y_class*.asc')
+ssfiles=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "R[0-9]{5}x_y_ss_raw[0-9]{1,2}.asc")
+texfiles=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "*R[0-9]{5}x_y_class[0-9]{1,2}.asc")
 
 #Array of side scan and texture chunks
 array1=($ssfiles)
@@ -10,10 +8,12 @@ array2=($texfiles)
 
 count=${#array1[@]}
 
+for i in "${!array1[@]}"; do
 
-for i in `seq 1 $count`
-do
-ssfile=${array1[$i-1]} 
-texfile=${array2[$i-1]}	
+
+ssfile=${array1[$i]} 
+texfile=${array2[$i]}	
+echo $ssfile
+echo $texfile
 done
 
