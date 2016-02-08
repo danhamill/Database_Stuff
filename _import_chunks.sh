@@ -1,8 +1,9 @@
 #list of side scan and texture chunks
-ssfiles=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "R[0-9]{5}x_y_ss_raw[0-9]{1,2}.asc")
-texfiles=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "*R[0-9]{5}x_y_class[0-9]{1,2}.asc")
+# ssfiles=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "R[0-9]{5}x_y_ss_raw[0-9]{1,2}.asc")
+# texfiles=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "*R[0-9]{5}x_y_class[0-9]{1,2}.asc")
 
-
+ssfile=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "R01769x_y_ss_raw0.asc")
+texfile=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "*R01769x_y_class0.asc")
 #Build Tables
 survey='sept_2014'
 tablename='tmp'
