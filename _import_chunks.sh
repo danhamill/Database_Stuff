@@ -1,17 +1,17 @@
 #list of side scan and texture chunks
-# ssfiles=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "R[0-9]{5}x_y_ss_raw[0-9]{1,2}.asc")
-# texfiles=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "*R[0-9]{5}x_y_class[0-9]{1,2}.asc")
+ssfiles=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "R[0-9]{5}x_y_ss_raw[0-9]{1,2}.asc")
+texfiles=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "*R[0-9]{5}x_y_class[0-9]{1,2}.asc")
 
-ssfile=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "R01769x_y_ss_raw0.asc")
-texfile=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "*R01769x_y_class0.asc")
+#File paths for testing individual files
+#ssfile=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "R01769x_y_ss_raw0.asc")
+#texfile=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "*R01769x_y_class0.asc")
+
 #Build Tables
 survey='sept_2014'
+mosaic='mosaic_2014_09'
 tablename='tmp'
 tablename2='tmp2'
 gist='_the_geom_gist'
-rpkey=$survey$pkey
-rgist=$survey$gist
-
 
 psql -h localhost -d reach_4a -U root -p 9000 -c "CREATE TABLE "$survey"( gid SERIAL NOT NULL,
  easting double precision, northing double precision, texture double precision, sidescan_intensity double precision, the_geom GEOMETRY, scan_line text, CONSTRAINT enforce_dims_the_geom CHECK (st_ndims(the_geom) = 2), CONSTRAINT enforce_geotype_geom CHECK (geometrytype(the_geom) = 'POINT'::text OR the_geom IS NULL), CONSTRAINT enforce_srid_the_geom CHECK (st_srid(the_geom) = 26949));"
@@ -66,4 +66,22 @@ psql -h localhost -d reach_4a -U root -p 9000 -c "INSERT INTO "$survey" (easting
 #Delete all data from temporary tables
 psql -h localhost -d reach_4a -U root -p 9000 -c "DELETE FROM "$tablename";"
 psql -h localhost -d reach_4a -U root -p 9000 -c "DELETE FROM "$tablename2";"
+
+#Maintenance temporary tables for improved efficiency
+psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$tablename";"
+psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$tablename2";"
 done
+
+#Create mosaic table
+psql -h localhost -d reach_4a -U root -p 9000 -c "CREATE TABLE "$mosaic" AS(SELECT tt.* FROM "$survey" tt INNER JOIN (SELECT easting, northing,texture, scan_line, MAX(sidescan_intensity) AS MaxSSIntensity FROM "$survey" GROUP BY (easting,northing,texture,scan_line)) groupedtt ON tt.easting = groupedtt.easting AND tt.northing = groupedtt.northing AND tt.texture = groupedtt.texture AND tt.scan_line = groupedtt.scan_line AND tt.sidescan_intensity = groupedtt.MaxSSIntensity);"
+
+
+#Populate Geometry field For mosaic
+psql -h localhost -d reach_4a -U root -p 9000 -c "UPDATE "$mosaic" SET the_geom = ST_SetSRID(ST_MakePoint(CAST(easting AS double precision), CAST(northing AS double precision)), 26949);"
+
+#Maintenance mosaic dataset from the geom update
+psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$tablename";"
+
+# #Drop temporary tables
+psql -h localhost -d reach_4a -U root -p 9000 -c "DROP TABLE "$tablename" ;"
+psql -h localhost -d reach_4a -U root -p 9000 -c "DROP TABLE "$tablename2" ;"
