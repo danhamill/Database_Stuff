@@ -47,6 +47,7 @@ psql -h localhost -d reach_4a -U root -p 9000 -c "\COPY "$tablename" (easting,no
 
 #Update texture table field with respective scan line of the chunk
 psql -h localhost -d reach_4a -U root -p 9000 -c "UPDATE "$tablename" SET scan_line= '"$name"' WHERE scan_line IS NULL;"
+psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$tablename";"
 
 #set variable ss chunks file path
 ssfile=${array1[$i]} 
@@ -54,6 +55,7 @@ echo $ssfile
 
 #Import side scan chunk
 psql -h localhost -d reach_4a -U root -p 9000 -c "\COPY "$tablename2" (easting,northing,sidescan_intensity) FROM "$ssfile" DELIMITER ' ' CSV;"
+psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$tablename2";"
 
 #Update texture chunk with SS intensity
 psql -h localhost -d reach_4a -U root -p 9000 -c "UPDATE "$tablename" SET sidescan_intensity="$tablename2".sidescan_intensity FROM "$tablename2" WHERE "$tablename2".easting="$tablename".easting AND "$tablename2".northing="$tablename".northing;"
@@ -73,6 +75,7 @@ psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$tablename2";"
 psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$survey";"
 done
 
+echo "Done importing chunks!!!"
 #Create mosaic table
 psql -h localhost -d reach_4a -U root -p 9000 -c "CREATE TABLE "$mosaic" AS(SELECT tt.* FROM "$survey" tt INNER JOIN (SELECT easting, northing,texture, scan_line, MAX(sidescan_intensity) AS MaxSSIntensity FROM "$survey" GROUP BY (easting,northing,texture,scan_line)) groupedtt ON tt.easting = groupedtt.easting AND tt.northing = groupedtt.northing AND tt.texture = groupedtt.texture AND tt.scan_line = groupedtt.scan_line AND tt.sidescan_intensity = groupedtt.MaxSSIntensity);"
 
