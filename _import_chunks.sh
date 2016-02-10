@@ -1,14 +1,14 @@
 #list of side scan and texture chunks
-ssfiles=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "R[0-9]{5}x_y_ss_raw[0-9]{1,2}.asc")
-texfiles=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "*R[0-9]{5}x_y_class[0-9]{1,2}.asc")
+ssfiles=$(find C:/Users/dan/Desktop/New_Folder/April_2015/ | egrep "R[0-9]{5}x_y_ss_raw[0-9]{1,2}.asc")
+texfiles=$(find C:/Users/dan/Desktop/New_Folder/April_2015/ | egrep "*R[0-9]{5}x_y_class[0-9]{1,2}.asc")
 
 #File paths for testing individual files
 #ssfile=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "R01769x_y_ss_raw0.asc")
 #texfile=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "*R01769x_y_class0.asc")
 
 #Build Tables
-survey='sept_2014'
-mosaic='mosaic_2014_09'
+survey='april_2014'
+mosaic='mosaic_2015_04'
 tablename='tmp'
 tablename2='tmp2'
 gist='_the_geom_gist'
@@ -70,6 +70,7 @@ psql -h localhost -d reach_4a -U root -p 9000 -c "DELETE FROM "$tablename2";"
 #Maintenance temporary tables for improved efficiency
 psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$tablename";"
 psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$tablename2";"
+psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$survey";"
 done
 
 #Create mosaic table
