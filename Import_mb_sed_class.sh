@@ -43,11 +43,11 @@ psql -h localhost -d reach_4a -U root -p 9000 -c "\COPY "$tablename2" (easting,n
 psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$tablename2";"
 
 #Update sedclass chunk with SS elevation
-psql -h localhost -d reach_4a -U root -p 9000 -c "UPDATE "$tablename2" SET SedClass="$tablename".SedClass FROM "$tablename" WHERE "$tablename".easting="$tablename2".easting AND "$tablename".northing="$tablename2".northing;"
+psql -h localhost -d reach_4a -U root -p 9000 -c "UPDATE "$tablename2" SET elevation="$tablename".elevation FROM "$tablename" WHERE "$tablename".easting="$tablename2".easting AND "$tablename".northing="$tablename2".northing;"
 echo "Successfully merged elevation and sediment classes!!"
 
 #Append to survey year main table
-psql -h localhost -d reach_4a -U root -p 9000 -c "INSERT INTO "$survey" (easting,northing,elevation,SedClass) (SELECT easting,northing,elevation,SedClass FROM "$tablename2");"
+psql -h localhost -d reach_4a -U root -p 9000 -c "INSERT INTO "$survey" (easting,northing,elevation,SedClass) (SELECT easting,northing,elevation,SedClass FROM "$tablename2" where elevation is not null);"
 
 #Delete all data from temporary tables
 psql -h localhost -d reach_4a -U root -p 9000 -c "DELETE FROM "$tablename";"
@@ -65,7 +65,7 @@ psql -h localhost -d reach_4a -U root -p 9000 -c "CREATE TABLE "$mosaic" AS(SELE
 
 
 #Populate Geometry field For mosaic
-psql -h localhost -d reach_4a -U root -p 9000 -c "UPDATE "$mosaic" SET the_geom = ST_SetSRID(ST_MakePoint(CAST(easting AS double precision), CAST(northing AS double precision)), 26949);"
+psql -h localhost -d reach_4a -U root -p 9000 -c "UPDATE "$survey" SET the_geom = ST_SetSRID(ST_MakePoint(CAST(easting AS double precision), CAST(northing AS double precision)), 26949);"
 
 #Maintenance mosaic dataset from the geom update
 psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$tablename";"
