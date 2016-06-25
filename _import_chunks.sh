@@ -1,6 +1,6 @@
 #list of side scan and texture chunks
-ssfiles=$(find C:/Users/dan/Desktop/New_Folder/April_2015/ | egrep "R[0-9]{5}x_y_ss_raw[0-9]{1,2}.asc")
-texfiles=$(find C:/Users/dan/Desktop/New_Folder/April_2015/ | egrep "*R[0-9]{5}x_y_class[0-9]{1,2}.asc")
+ssfiles=$(find C:/workspace/Reach_4a/2014_04/ | egrep "R[0-9]{5}x_y_ss_raw[0-9]{1,2}.asc")
+texfiles=$(find C:/workspace/Reach_4a/2014_04/ | egrep "*R[0-9]{5}x_y_class[0-9]{1,2}.asc")
 
 #File paths for testing individual files
 #ssfile=$(find C:/Users/dan/Desktop/New_Folder/Sept_2014/ | egrep "R01769x_y_ss_raw0.asc")
@@ -8,7 +8,7 @@ texfiles=$(find C:/Users/dan/Desktop/New_Folder/April_2015/ | egrep "*R[0-9]{5}x
 
 #Build Tables
 survey='april_2014'
-mosaic='mosaic_2015_04'
+# mosaic='mosaic_2015_04'
 tablename='tmp'
 tablename2='tmp2'
 gist='_the_geom_gist'
@@ -77,14 +77,14 @@ done
 
 echo "Done importing chunks!!!"
 #Create mosaic table
-psql -h localhost -d reach_4a -U root -p 9000 -c "CREATE TABLE "$mosaic" AS(SELECT tt.* FROM "$survey" tt INNER JOIN (SELECT easting, northing,texture, scan_line, MAX(sidescan_intensity) AS MaxSSIntensity FROM "$survey" GROUP BY (easting,northing,texture,scan_line)) groupedtt ON tt.easting = groupedtt.easting AND tt.northing = groupedtt.northing AND tt.texture = groupedtt.texture AND tt.scan_line = groupedtt.scan_line AND tt.sidescan_intensity = groupedtt.MaxSSIntensity);"
+# psql -h localhost -d reach_4a -U root -p 9000 -c "CREATE TABLE "$mosaic" AS(SELECT tt.* FROM "$survey" tt INNER JOIN (SELECT easting, northing,texture, scan_line, MAX(sidescan_intensity) AS MaxSSIntensity FROM "$survey" GROUP BY (easting,northing,texture,scan_line)) groupedtt ON tt.easting = groupedtt.easting AND tt.northing = groupedtt.northing AND tt.texture = groupedtt.texture AND tt.scan_line = groupedtt.scan_line AND tt.sidescan_intensity = groupedtt.MaxSSIntensity);"
 
 
 #Populate Geometry field For mosaic
-psql -h localhost -d reach_4a -U root -p 9000 -c "UPDATE "$mosaic" SET the_geom = ST_SetSRID(ST_MakePoint(CAST(easting AS double precision), CAST(northing AS double precision)), 26949);"
+# psql -h localhost -d reach_4a -U root -p 9000 -c "UPDATE "$mosaic" SET the_geom = ST_SetSRID(ST_MakePoint(CAST(easting AS double precision), CAST(northing AS double precision)), 26949);"
 
 #Maintenance mosaic dataset from the geom update
-psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$tablename";"
+# psql -h localhost -d reach_4a -U root -p 9000 -c "VACUUM "$tablename";"
 
 # #Drop temporary tables
 psql -h localhost -d reach_4a -U root -p 9000 -c "DROP TABLE "$tablename" ;"
